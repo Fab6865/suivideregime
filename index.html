@@ -1,0 +1,572 @@
+<html><head><base href="https://weightjourney.app/"><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>WeightJourney - Suivi de Perte de Poids</title><style>
+    body {
+        font-family: 'Roboto', sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f0f4f8;
+        color: #333;
+    }
+    .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    h1, h2 {
+        color: #2c3e50;
+        text-align: center;
+    }
+    .form-group {
+        margin-bottom: 20px;
+    }
+    label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+    input[type="number"], input[type="date"], select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+    button {
+        background-color: #3498db;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        margin-right: 10px;
+    }
+    button:hover {
+        background-color: #2980b9;
+    }
+    #weightChart, #monthlyWeightChart {
+        margin-top: 30px;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    #message {
+        margin-top: 20px;
+        padding: 10px;
+        border-radius: 4px;
+        font-weight: bold;
+        text-align: center;
+    }
+    .success {
+        background-color: #2ecc71;
+        color: white;
+    }
+    .neutral {
+        background-color: #f39c12;
+        color: white;
+    }
+    nav {
+        background-color: #3498db;
+        padding: 10px 0;
+    }
+    nav ul {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+        text-align: center;
+    }
+    nav ul li {
+        display: inline;
+        margin: 0 10px;
+    }
+    nav ul li a {
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+    }
+    #goalInfo {
+        background-color: #ecf0f1;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+    #goalInfo span {
+        font-weight: bold;
+        color: #3498db;
+    }
+    #setupForm, #advicePage {
+        background-color: white;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+    #congratulations {
+        background-color: #2ecc71;
+        color: white;
+        padding: 20px;
+        border-radius: 8px;
+        text-align: center;
+        font-size: 24px;
+        margin-top: 20px;
+        animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+        0% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.05);
+        }
+        100% {
+            transform: scale(1);
+        }
+    }
+    #newChallengeButtons {
+        text-align: center;
+        margin-top: 20px;
+    }
+    #newChallengeButtons button {
+        margin: 0 10px;
+    }
+    #saveStatus {
+        text-align: center;
+        margin-top: 10px;
+        font-style: italic;
+        color: #7f8c8d;
+    }
+    #achievementTime {
+        font-size: 18px;
+        margin-top: 10px;
+        color: #2c3e50;
+    }
+    .advice-section {
+        margin-bottom: 30px;
+    }
+    .advice-section h3 {
+        color: #2c3e50;
+        border-bottom: 2px solid #3498db;
+        padding-bottom: 10px;
+    }
+    .advice-section ul {
+        list-style-type: none;
+        padding-left: 0;
+    }
+    .advice-section li {
+        margin-bottom: 10px;
+        padding-left: 20px;
+        position: relative;
+    }
+    .advice-section li:before {
+        content: "•";
+        color: #3498db;
+        font-size: 1.5em;
+        position: absolute;
+        left: 0;
+        top: -5px;
+    }
+    .workout-program {
+        background-color: #ecf0f1;
+        border-radius: 8px;
+        padding: 15px;
+        margin-top: 20px;
+    }
+    .workout-program h4 {
+        color: #2c3e50;
+        margin-top: 0;
+    }
+    .workout-day {
+        margin-bottom: 15px;
+    }
+    .workout-day h5 {
+        color: #3498db;
+        margin-bottom: 5px;
+    }
+</style><script src="https://cdn.jsdelivr.net/npm/chart.js"></script></head><body>
+    <nav>
+        <ul>
+            <li><a href="#" onclick="showPage('setup')">Configuration</a></li>
+            <li><a href="#" onclick="showPage('daily')">Suivi Quotidien</a></li>
+            <li><a href="#" onclick="showPage('monthly')">Résumé Mensuel</a></li>
+            <li><a href="#" onclick="showPage('advice')">Conseils & Programme</a></li>
+        </ul>
+    </nav>
+
+    <div id="setupPage" class="container">
+        <h1>WeightJourney - Configuration</h1>
+        <form id="setupForm">
+            <div class="form-group">
+                <label for="startWeight">Poids de départ (kg):</label>
+                <input type="number" id="startWeight" step="0.1" required>
+            </div>
+            <div class="form-group">
+                <label for="goalWeight">Objectif de poids (kg):</label>
+                <input type="number" id="goalWeight" step="0.1" required>
+            </div>
+            <div class="form-group">
+                <label for="startDate">Date de début:</label>
+                <input type="date" id="startDate" required>
+            </div>
+            <button type="submit">Enregistrer</button>
+        </form>
+    </div>
+
+    <div id="dailyPage" class="container" style="display:none;">
+        <h1>WeightJourney - Suivi Quotidien</h1>
+        <div id="goalInfo"></div>
+        <form id="weightForm">
+            <div class="form-group">
+                <label for="weight">Poids (kg):</label>
+                <input type="number" id="weight" step="0.1" required>
+            </div>
+            <div class="form-group">
+                <label for="date">Date:</label>
+                <input type="date" id="date" required>
+            </div>
+            <button type="submit">Ajouter</button>
+        </form>
+        <div id="message"></div>
+        <canvas id="weightChart"></canvas>
+        <div id="congratulations" style="display:none;">
+            <h2>FÉLICITATIONS !</h2>
+            <p>Vous avez atteint votre objectif de poids !</p>
+            <div id="achievementTime"></div>
+            <div id="newChallengeButtons">
+                <button onclick="startNewChallenge()">Commencer un nouveau défi</button>
+                <button onclick="continueMaintenance()">Continuer le suivi de maintenance</button>
+            </div>
+        </div>
+        <div id="saveStatus"></div>
+    </div>
+
+    <div id="monthlyPage" class="container" style="display:none;">
+        <h1>WeightJourney - Résumé Mensuel</h1>
+        <div id="goalInfoMonthly"></div>
+        <div class="form-group">
+            <label for="monthSelector">Sélectionnez un mois:</label>
+            <select id="monthSelector"></select>
+        </div>
+        <canvas id="monthlyWeightChart"></canvas>
+    </div>
+
+    <div id="advicePage" class="container" style="display:none;">
+        <h1>Conseils et Programme Sportif</h1>
+        
+        <div class="advice-section">
+            <h3>Conseils Alimentaires</h3>
+            <ul>
+                <li>Privilégiez les aliments riches en protéines et en fibres pour favoriser la satiété.</li>
+                <li>Réduisez votre consommation de sucres raffinés et de graisses saturées.</li>
+                <li>Buvez suffisamment d'eau (au moins 2 litres par jour) pour rester hydraté.</li>
+                <li>Optez pour des collations saines comme des fruits, des légumes ou des noix.</li>
+                <li>Surveillez vos portions et utilisez des assiettes plus petites pour contrôler les quantités.</li>
+                <li>Évitez les boissons sucrées et limitez votre consommation d'alcool.</li>
+                <li>Prenez le temps de manger lentement pour mieux ressentir la satiété.</li>
+            </ul>
+        </div>
+        
+        <div class="advice-section">
+            <h3>Conseils Sportifs</h3>
+            <ul>
+                <li>Visez au moins 150 minutes d'activité physique modérée par semaine.</li>
+                <li>Combinez des exercices cardio et de renforcement musculaire pour optimiser la perte de poids.</li>
+                <li>Commencez doucement et augmentez progressivement l'intensité de vos séances.</li>
+                <li>Variez vos activités pour éviter la monotonie et solliciter différents groupes musculaires.</li>
+                <li>N'oubliez pas de vous échauffer avant l'effort et de vous étirer après.</li>
+                <li>Restez actif au quotidien : prenez les escaliers, marchez plus souvent, etc.</li>
+                <li>Écoutez votre corps et accordez-vous des jours de repos pour récupérer.</li>
+            </ul>
+        </div>
+        
+        <div class="workout-program">
+            <h4>Programme Sportif pour Accélérer la Perte de Poids</h4>
+            <p>Ce programme est conçu pour 4 jours par semaine. Ajustez-le selon votre niveau et vos disponibilités.</p>
+            
+            <div class="workout-day">
+                <h5>Jour 1 : Cardio Intense</h5>
+                <ul>
+                    <li>20 minutes de course à pied ou vélo à intensité modérée</li>
+                    <li>20 minutes d'intervalles (30 secondes d'effort intense, 30 secondes de récupération)</li>
+                    <li>10 minutes de marche rapide pour récupérer</li>
+                </ul>
+            </div>
+            
+            <div class="workout-day">
+                <h5>Jour 2 : Renforcement Musculaire</h5>
+                <ul>
+                    <li>3 séries de 12-15 répétitions pour chaque exercice :</li>
+                    <li>Squats</li>
+                    <li>Pompes (ou pompes sur les genoux)</li>
+                    <li>Fentes alternées</li>
+                    <li>Dips sur chaise</li>
+                    <li>Planche (tenir 30 secondes)</li>
+                </ul>
+            </div>
+            
+            <div class="workout-day">
+                <h5>Jour 3 : Cardio Modéré et Stretching</h5>
+                <ul>
+                    <li>45 minutes de marche rapide, natation ou vélo à intensité modérée</li>
+                    <li>15 minutes de stretching pour améliorer la flexibilité</li>
+                </ul>
+            </div>
+            
+            <div class="workout-day">
+                <h5>Jour 4 : Circuit Training</h5>
+                <ul>
+                    <li>Répétez ce circuit 3 fois, avec 1 minute de repos entre chaque tour :</li>
+                    <li>30 secondes de jumping jacks</li>
+                    <li>30 secondes de mountain climbers</li>
+                    <li>30 secondes de burpees</li>
+                    <li>30 secondes de squat jumps</li>
+                    <li>30 secondes de planche</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let weights = [];
+        let dates = [];
+        let monthlyData = {};
+        let startWeight, goalWeight, startDate;
+        const ctx = document.getElementById('weightChart').getContext('2d');
+        const monthlyCtx = document.getElementById('monthlyWeightChart').getContext('2d');
+        let chart, monthlyChart;
+
+        function initChart() {
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [{
+                        label: 'Poids (kg)',
+                        data: weights,
+                        borderColor: '#3498db',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: false
+                        }
+                    }
+                }
+            });
+        }
+
+        function showMessage(text, isSuccess) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = text;
+            messageDiv.className = isSuccess ? 'success' : 'neutral';
+        }
+
+        function saveData() {
+            localStorage.setItem('weights', JSON.stringify(weights));
+            localStorage.setItem('dates', JSON.stringify(dates));
+            localStorage.setItem('monthlyData', JSON.stringify(monthlyData));
+            localStorage.setItem('startWeight', startWeight);
+            localStorage.setItem('goalWeight', goalWeight);
+            localStorage.setItem('startDate', startDate);
+            
+            const saveStatus = document.getElementById('saveStatus');
+            saveStatus.textContent = 'Données sauvegardées automatiquement';
+            setTimeout(() => {
+                saveStatus.textContent = '';
+            }, 2000);
+        }
+
+        function loadData() {
+            weights = JSON.parse(localStorage.getItem('weights')) || [];
+            dates = JSON.parse(localStorage.getItem('dates')) || [];
+            monthlyData = JSON.parse(localStorage.getItem('monthlyData')) || {};
+            startWeight = parseFloat(localStorage.getItem('startWeight')) || 0;
+            goalWeight = parseFloat(localStorage.getItem('goalWeight')) || 0;
+            startDate = localStorage.getItem('startDate') || '';
+
+            if (startWeight && goalWeight && startDate) {
+                document.getElementById('startWeight').value = startWeight;
+                document.getElementById('goalWeight').value = goalWeight;
+                document.getElementById('startDate').value = startDate;
+                showPage('daily');
+            } else {
+                showPage('setup');
+            }
+
+            initChart();
+            updateMonthSelector();
+            updateGoalInfo();
+        }
+
+        document.getElementById('weightForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const weight = parseFloat(document.getElementById('weight').value);
+            const date = document.getElementById('date').value;
+
+            if (weights.length > 0) {
+                const lastWeight = weights[weights.length - 1];
+                if (weight < lastWeight) {
+                    showMessage('Bravo ! Vous avez perdu du poids !', true);
+                } else if (weight > lastWeight) {
+                    showMessage('Ne vous découragez pas ! Continuez vos efforts !', false);
+                } else {
+                    showMessage('Votre poids n\'a pas changé. Gardez votre motivation !', false);
+                }
+            } else {
+                showMessage('Bienvenue ! Commencez votre voyage vers une meilleure santé !', true);
+            }
+
+            weights.push(weight);
+            dates.push(date);
+
+            updateMonthlyData(date, weight);
+
+            if (chart) {
+                chart.destroy();
+            }
+            initChart();
+
+            document.getElementById('weight').value = '';
+            document.getElementById('date').value = '';
+
+            updateMonthSelector();
+            updateGoalInfo();
+            checkGoalAchieved();
+            saveData();
+        });
+
+        function updateMonthlyData(date, weight) {
+            const monthYear = date.substring(0, 7); // Get YYYY-MM
+            if (!monthlyData[monthYear]) {
+                monthlyData[monthYear] = [];
+            }
+            monthlyData[monthYear].push(weight);
+        }
+
+        function updateMonthSelector() {
+            const selector = document.getElementById('monthSelector');
+            selector.innerHTML = '';
+            Object.keys(monthlyData).sort().forEach(month => {
+                const option = document.createElement('option');
+                option.value = month;
+                option.textContent = month;
+                selector.appendChild(option);
+            });
+            selector.addEventListener('change', updateMonthlyChart);
+        }
+
+        function updateMonthlyChart() {
+            const selectedMonth = document.getElementById('monthSelector').value;
+            const monthWeights = monthlyData[selectedMonth];
+
+            if (monthlyChart) {
+                monthlyChart.destroy();
+            }
+
+            monthlyChart = new Chart(monthlyCtx, {
+                type: 'line',
+                data: {
+                    labels: monthWeights.map((_, index) => index + 1),
+                    datasets: [{
+                        label: 'Poids (kg)',
+                        data: monthWeights,
+                        borderColor: '#3498db',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: false
+                        }
+                    }
+                }
+            });
+        }
+
+        function showPage(pageId) {
+            document.getElementById('setupPage').style.display = pageId === 'setup' ? 'block' : 'none';
+            document.getElementById('dailyPage').style.display = pageId === 'daily' ? 'block' : 'none';
+            document.getElementById('monthlyPage').style.display = pageId === 'monthly' ? 'block' : 'none';
+            document.getElementById('advicePage').style.display = pageId === 'advice' ? 'block' : 'none';
+            if (pageId === 'monthly') {
+                updateMonthlyChart();
+            }
+            if (pageId === 'daily' || pageId === 'monthly') {
+                updateGoalInfo();
+            }
+        }
+
+        document.getElementById('setupForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            startWeight = parseFloat(document.getElementById('startWeight').value);
+            goalWeight = parseFloat(document.getElementById('goalWeight').value);
+            startDate = document.getElementById('startDate').value;
+            saveData();
+            showPage('daily');
+            updateGoalInfo();
+        });
+
+        function updateGoalInfo() {
+            const goalInfo = document.getElementById('goalInfo');
+            const goalInfoMonthly = document.getElementById('goalInfoMonthly');
+            const currentWeight = weights.length > 0 ? weights[weights.length - 1] : startWeight;
+            const weightLoss = startWeight - currentWeight;
+            const remainingLoss = currentWeight - goalWeight;
+            const progressPercentage = ((startWeight - currentWeight) / (startWeight - goalWeight) * 100).toFixed(2);
+
+            const infoText = `
+                Poids de départ: <span>${startWeight} kg</span> | 
+                Objectif: <span>${goalWeight} kg</span> | 
+                Poids actuel: <span>${currentWeight} kg</span><br>
+                Perte de poids: <span>${weightLoss.toFixed(1)} kg</span> | 
+                Reste à perdre: <span>${remainingLoss.toFixed(1)} kg</span> | 
+                Progrès: <span>${progressPercentage}%</span>
+            `;
+
+            goalInfo.innerHTML = infoText;
+            goalInfoMonthly.innerHTML = infoText;
+        }
+
+        function checkGoalAchieved() {
+            const currentWeight = weights[weights.length - 1];
+            if (currentWeight <= goalWeight) {
+                const achievementDate = new Date(dates[dates.length - 1]);
+                const startDateObj = new Date(startDate);
+                const timeDiff = achievementDate - startDateObj;
+                const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+                const months = Math.floor(daysDiff / 30);
+                const years = Math.floor(months / 12);
+                const remainingMonths = months % 12;
+                const remainingDays = daysDiff % 30;
+
+                let achievementTimeText = "Vous avez atteint votre objectif en : ";
+                if (years > 0) {
+                    achievementTimeText += `${years} an${years > 1 ? 's' : ''}, `;
+                }
+                if (remainingMonths > 0) {
+                    achievementTimeText += `${remainingMonths} mois, `;
+                }
+                achievementTimeText += `${remainingDays} jour${remainingDays > 1 ? 's' : ''}`;
+
+                document.getElementById('achievementTime').textContent = achievementTimeText;
+                document.getElementById('congratulations').style.display = 'block';
+            }
+        }
+
+        function startNewChallenge() {
+            document.getElementById('congratulations').style.display = 'none';
+            showPage('setup');
+        }
+
+        function continueMaintenance() {
+            document.getElementById('congratulations').style.display = 'none';
+            showMessage("Excellent ! Continuez à maintenir votre poids actuel.", true);
+        }
+
+        // Initialize
+        loadData();
+    </script>
+</body></html>
